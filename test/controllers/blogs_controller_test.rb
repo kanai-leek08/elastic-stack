@@ -11,14 +11,14 @@ class BlogsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create blog" do
-    HttpClient.new.elastic.post_payload_as_json(
-      "/blog/_delete_by_query",
-      {
-        "query":{
-          "match_all": {}
-        }
-      }
-    )
+    # HttpClient.new.elastic.post_payload_as_json(
+    #   "/blog/_delete_by_query",
+    #   {
+    #     "query":{
+    #       "match_all": {}
+    #     }
+    #   }
+    # )
     assert_difference('Blog.count') do
       post blogs_url, params: { blog: { auther: @blog.auther, body: @blog.body, category: @blog.category, title: @blog.title } }
     end
