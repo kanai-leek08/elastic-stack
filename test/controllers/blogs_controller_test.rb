@@ -10,39 +10,15 @@ class BlogsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get new" do
-    get new_blog_url
-    assert_response :success
-  end
-
   test "should create blog" do
     assert_difference('Blog.count') do
       post blogs_url, params: { blog: { auther: @blog.auther, body: @blog.body, category: @blog.category, title: @blog.title } }
     end
 
+    res = Faraday.get "http://localhost:9200/blog/_search"
+
+    assert_equal 'index_not_found_exception', JSON.parse(res.body)['error']['type']
     assert_redirected_to blog_url(Blog.last)
   end
 
-  test "should show blog" do
-    get blog_url(@blog)
-    assert_response :success
-  end
-
-  test "should get edit" do
-    get edit_blog_url(@blog)
-    assert_response :success
-  end
-
-  test "should update blog" do
-    patch blog_url(@blog), params: { blog: { auther: @blog.auther, body: @blog.body, category: @blog.category, title: @blog.title } }
-    assert_redirected_to blog_url(@blog)
-  end
-
-  test "should destroy blog" do
-    assert_difference('Blog.count', -1) do
-      delete blog_url(@blog)
-    end
-
-    assert_redirected_to blogs_url
-  end
 end
