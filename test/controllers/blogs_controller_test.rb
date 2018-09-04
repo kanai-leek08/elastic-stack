@@ -14,10 +14,10 @@ class BlogsControllerTest < ActionDispatch::IntegrationTest
     assert_difference('Blog.count') do
       post blogs_url, params: { blog: { auther: @blog.auther, body: @blog.body, category: @blog.category, title: @blog.title } }
     end
-
+    sleep 1
     res = Faraday.get "http://localhost:9200/blog/_search"
 
-    assert_equal 'index_not_found_exception', JSON.parse(res.body)['error']['type']
+    assert_equal 1, JSON.parse(res.body)['hits']['total']
     assert_redirected_to blog_url(Blog.last)
   end
 

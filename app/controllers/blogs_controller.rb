@@ -28,6 +28,10 @@ class BlogsController < ApplicationController
 
     respond_to do |format|
       if @blog.save
+        res = HttpClient.new.erastic.post_payload_as_json(
+          '/blog/_doc',
+          blog_params
+        )
         format.html { redirect_to @blog, notice: 'Blog was successfully created.' }
         format.json { render :show, status: :created, location: @blog }
       else
@@ -35,6 +39,7 @@ class BlogsController < ApplicationController
         format.json { render json: @blog.errors, status: :unprocessable_entity }
       end
     end
+
   end
 
   # PATCH/PUT /blogs/1
@@ -72,3 +77,66 @@ class BlogsController < ApplicationController
       params.require(:blog).permit(:title, :body, :category, :auther)
     end
 end
+
+# frozen_string_literal: true
+
+class HttpClient
+  CODE_SUCCESS = 'success'
+  CODE_DUPLICATION = 'duplication'
+
+  def erastic 
+    @con = connect("http://localhost:9200")
+    self
+  end
+
+  def get(target, params = {})
+    json_parse(get_body(target, params))
+  end
+
+  def get_body(target, params)
+    response = @con.get do |req|
+      req.url target
+      if params.present?
+        req.params = params
+      end
+      req.headers['Referer'] = 'pd_operation'
+      req.headers['token'] = auth_token
+    end
+    raise if status_error?(response)
+    response.body
+  end
+
+  def post_with_json(target, params)
+    response = post_payload_as_json(target, params)
+    raise response.body if status_error?(response)
+    json_parse(response.body)
+  end
+
+  def post_payload_as_json(target, params)
+    @con.post do |req|
+      req.url target
+      req.headers['Content-Type'] = 'application/json'
+      req.body = params.to_json
+    end
+  end
+
+  private
+
+  def connect(base_url)
+    Faraday.new(url: base_url) do |builder|
+      builder.ssl.verify = false
+      builder.request :url_encoded
+      # builder.adapter Faraday.default_adapter
+      builder.adapter :typhoeus
+    end
+  end
+
+  def status_error?(response)
+    response.status != 200
+  end
+
+  def json_parse(body)
+    JSON.parse(body, {symbolize_names: true})
+  end
+end
+
