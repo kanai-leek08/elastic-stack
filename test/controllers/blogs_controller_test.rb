@@ -11,19 +11,19 @@ class BlogsControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should migrate blog" do
-    sleep 1
-    res = Faraday.get "http://localhost:9200/blog"
-    assert_equal "1", JSON.parse(res.body)['blog']['settings']['index']['number_of_shards']
+    sleep 0.8
+    res = HttpClient.new.elastic.get "/blog"
+    assert_equal "1", res[:blog][:settings][:index][:number_of_shards]
   end
 
   test "should create blog" do
     assert_difference('Blog.count') do
       post blogs_url, params: { blog: { auther: @blog.auther, body: @blog.body, category: @blog.category, title: @blog.title } }
     end
-    sleep 1
-    res = Faraday.get "http://localhost:9200/blog/_search"
+    sleep 0.8
+    res = HttpClient.new.elastic.get '/blog/_search'
 
-    assert_equal 1, JSON.parse(res.body)['hits']['total']
+    assert_equal 1, res[:hits][:total]
     assert_redirected_to blog_url(Blog.last)
   end
 

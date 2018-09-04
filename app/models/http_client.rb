@@ -5,7 +5,11 @@ class HttpClient
   CODE_DUPLICATION = 'duplication'
 
   def elastic 
-    @con = connect("http://localhost:9200")
+    if Rails.env == 'test'
+      @con = connect("http://localhost:9200")
+    else
+      @con = connect("http://localhost:9200")
+    end
     self
   end
 
@@ -19,8 +23,6 @@ class HttpClient
       if params.present?
         req.params = params
       end
-      req.headers['Referer'] = 'pd_operation'
-      req.headers['token'] = auth_token
     end
     raise if status_error?(response)
     response.body
