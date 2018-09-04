@@ -6,7 +6,7 @@ class HttpClient
 
   def elastic 
     if Rails.env == 'test'
-      @con = connect("http://localhost:9200")
+      @con = connect("http://localhost:9201")
     else
       @con = connect("http://localhost:9200")
     end

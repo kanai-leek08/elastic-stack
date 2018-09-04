@@ -6,10 +6,23 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
     container_name: elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
     volumes:
       - esdata:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+    networks:
+      - esnet
+  elasticsearch_test:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    container_name: elasticsearch_test
+    environment:
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    volumes:
+      - esdata_test:/usr/share/elasticsearch_test/data
+    ports:
+      - 9201:9200
     networks:
       - esnet
   kibana:
@@ -23,5 +36,7 @@ services:
       - esnet
 volumes:
   esdata:
+    driver: local
+  esdata_test:
     driver: local
 
