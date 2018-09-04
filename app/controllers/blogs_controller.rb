@@ -28,7 +28,7 @@ class BlogsController < ApplicationController
 
     respond_to do |format|
       if @blog.save
-        res = HttpClient.new.erastic.post_payload_as_json(
+        res = HttpClient.new.elastic.post_payload_as_json(
           '/blog/_doc',
           blog_params
         )
@@ -84,7 +84,7 @@ class HttpClient
   CODE_SUCCESS = 'success'
   CODE_DUPLICATION = 'duplication'
 
-  def erastic 
+  def elastic
     @con = connect("http://localhost:9200")
     self
   end
@@ -118,6 +118,10 @@ class HttpClient
       req.headers['Content-Type'] = 'application/json'
       req.body = params.to_json
     end
+  end
+
+  def delete(target)
+    @con.delete(target)
   end
 
   private
