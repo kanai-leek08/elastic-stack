@@ -40,6 +40,15 @@ class HttpClient
     end
   end
 
+  def put_payload_as_json(target, params)
+    @con.put do |req|
+      req.url target
+      req.headers['Content-Type'] = 'application/json'
+      req.body = params.to_json
+    
+    end
+  end
+
   def delete(target)
     @con.delete(target)
   end
