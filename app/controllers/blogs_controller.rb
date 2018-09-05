@@ -28,10 +28,7 @@ class BlogsController < ApplicationController
 
     respond_to do |format|
       if @blog.save
-        res = HttpClient.new.elastic.post_payload_as_json(
-          '/blog/_doc',
-          blog_params
-        )
+        HttpClient.new.elastic.post_payload_as_json('/blog/_doc', blog_params)
         format.html { redirect_to @blog, notice: 'Blog was successfully created.' }
         format.json { render :show, status: :created, location: @blog }
       else
