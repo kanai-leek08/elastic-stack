@@ -7,6 +7,7 @@ class HttpClient
   def elastic 
     if Rails.env == 'test'
       @con = connect("http://localhost:9201")
+      @refresh_param = 'refresh=wait_for'
     else
       @con = connect("http://localhost:9200")
     end
